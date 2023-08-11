@@ -1,5 +1,5 @@
-use binread::{io::Cursor, BinRead, BinReaderExt};
-use std::{io::Read, task::Context};
+use binread::{io::Cursor, BinReaderExt};
+use std::{io::Read};
 
 #[derive(Debug)]
 pub enum ConstantPoolTags {
@@ -25,7 +25,7 @@ pub fn get_constant_pool(
 ) -> Vec<ConstantPoolTags> {
     {
         let mut working_pool = vec![];
-        for i in 0..constant_pool_count - 1 {
+        for _i in 0..constant_pool_count - 1 {
             let tag: u8 = reader.read_be().unwrap();
             let info: ConstantPoolTags = match tag {
                 1 => {

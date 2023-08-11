@@ -1,12 +1,12 @@
-use std::{io::Read, task::Context};
 
-use binread::{io::Cursor, BinRead, BinReaderExt};
-use clap::arg;
+
+use binread::{io::Cursor, BinReaderExt};
+
 use constpool::ConstantPoolTags;
 
-use std::path::PathBuf;
 
-use clap::{Parser, Subcommand};
+
+
 
 use crate::{
     attributes::{attribute, get_atributes},
@@ -104,7 +104,7 @@ fn main() {
     println!("Method count : {}", method_count);
     let mut methods: Vec<method_info> = vec![];
 
-    for i in 0..method_count {
+    for _i in 0..method_count {
         let methodaccess_flags = reader.read_be::<u16>().unwrap();
         let name_index = reader.read_be::<u16>().unwrap();
         let descriptor_index = reader.read_be::<u16>().unwrap();
@@ -128,7 +128,7 @@ fn main() {
     }
 
     let attribute_count = reader.read_be::<u16>().unwrap();
-    let classattributes = get_atributes(attribute_count, &mut reader, &constant_pool);
+    let _classattributes = get_atributes(attribute_count, &mut reader, &constant_pool);
 
     if reader.position() == HELLOWORLD.len() as u64 {
         println!("Finished Parseing")
@@ -146,7 +146,7 @@ fn main() {
         for a in m.attributes {
             match a.info {
                 attributes::attribute_info::LineNumberTable(_, _) => todo!(),
-                attributes::attribute_info::Code(_, _, _, code, _, _, sourceLines) => {
+                attributes::attribute_info::Code(_, _, _, code, _, _, _sourceLines) => {
                     println!("Bytecode: {:?}", &code);
                     let length = code.len();
                     let mut bytecode = Cursor::new(code);

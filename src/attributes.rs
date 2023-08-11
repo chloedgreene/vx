@@ -1,5 +1,5 @@
-use binread::{io::Cursor, BinRead, BinReaderExt};
-use std::{io::Read, task::Context};
+use binread::{io::Cursor, BinReaderExt};
+use std::{io::Read};
 
 use crate::{attributes, constpool::ConstantPoolTags};
 
@@ -24,7 +24,7 @@ pub fn get_atributes(
     constant_pool: &Vec<ConstantPoolTags>,
 ) -> Vec<attribute> {
     let mut attributes: Vec<attribute> = vec![];
-    for i in 0..attributes_count {
+    for _i in 0..attributes_count {
         let attribute_name_index = reader.read_be::<u16>().unwrap();
         let attribute_length = reader.read_be::<u32>().unwrap();
         let attribute_type = &constant_pool[attribute_name_index as usize - 1];
@@ -39,7 +39,7 @@ pub fn get_atributes(
                         let lntl = reader.read_be::<u16>().unwrap(); //line_number_table_length
 
                         let mut lnt: Vec<(u16, u16)> = vec![]; //line number tbale
-                        for i in 0..lntl {
+                        for _i in 0..lntl {
                             let spc = reader.read_be::<u16>().unwrap(); //starting index of code
                             let ln = reader.read_be::<u16>().unwrap(); //liine number
                             lnt.push((spc, ln))
@@ -57,7 +57,7 @@ pub fn get_atributes(
                             bytes
                         };
                         let exception_table_length = reader.read_be::<u16>().unwrap();
-                        for i in 0..exception_table_length {
+                        for _i in 0..exception_table_length {
                             panic!("Cant parse exceptions yet")
                         }
                         let attribues_count = reader.read_be::<u16>().unwrap();

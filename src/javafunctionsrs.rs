@@ -3,7 +3,7 @@ use crate::Varubals;
 pub fn execute_internel_function(
     class: &str,
     name: &str,
-    tpye: &str,
+    _tpye: &str,
     local_stack: &mut Vec<Varubals>,
 ) {
     // spelling mistake intentional, ask chloe
