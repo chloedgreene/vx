@@ -3,11 +3,12 @@ use std::{task::Context, io::Read};
 use binread::{BinRead, io::Cursor, BinReaderExt};
 use constpool::ConstantPoolTags;
 
-use crate::{constpool::{get_constant_pool}, method::method_info, attributes::{attribute, get_atributes}};
+use crate::{constpool::{get_constant_pool}, method::method_info, attributes::{attribute, get_atributes}, javafunctionsrs::execute_internel_function};
 
 mod constpool;
 mod method;
 mod attributes;
+mod javafunctionsrs;
 
 const HELLOWORLD: &[u8; 417] = include_bytes!("../code/Hello.class");
 
@@ -22,21 +23,23 @@ enum ClassAccessFlags{
     ENUM 	    =  0x4000,
 }
 
-enum MethodAccessFlag {
-    PUBLIC      	= 0x0001,
-    PRIVATE 	    = 0x0002,
-    PROTECTED 	    = 0x0004,
-    STATIC 	        = 0x0008,
-    FINAL        	= 0x0010,
-    SYNCHRONIZED 	= 0x0020,
-    BRIDGE 	        = 0x0040,
-    VARARGS 	    = 0x0080,
-    NATIVE 	        = 0x0100,
-    ABSTRACT 	    = 0x0400,
-    STRICT 	        = 0x0800,
-    SYNTHETIC 	    = 0x1000
+#[derive(Debug,Clone)]
+pub enum Varubals{
+    Boolean,
+    Byte,
+    Char,
+    Short,
+    Int,
+    Float,
+    Reference(ReferenceType),
+    ReturnAddress,
+    Class(String,String,String),
+    String(String)
 }
-
+#[derive(Debug,Copy,Clone)]
+pub enum ReferenceType{
+    Constpool(u16)
+}
 
 fn main() {
     
@@ -120,7 +123,172 @@ fn main() {
 
     if reader.position() == HELLOWORLD.len() as u64{
         println!("Finished Parseing")
+    }else {
+        panic!("parsed done not at end of file")
     }
+
+    ////////////////////////////////////////////////////////////////////
+    /// EXECUTE CODE
+    println!("////////////////////////////////////////////////////////////////////");
+    ////////////////////////////////////////////////////////////////////
+    
+
+    for m in methods{
+        println!("{:?}",m);
+        for a in m.attributes{
+
+            match a.info {
+                attributes::attribute_info::LineNumberTable(_, _) => todo!(),
+                attributes::attribute_info::Code(_, _, _, code, _, _, sourceLines) => {
+
+                    println!("Bytecode: {:?}",&code);
+                    let length = code.len();
+                    let mut bytecode = Cursor::new(code);
+                    
+                    let mut local_varuble_array:Vec<Varubals> = vec![];
+                    local_varuble_array.push(Varubals::Reference(ReferenceType::Constpool(this_class)));
+
+                    let mut operand_stack:Vec<Varubals> = vec![];
+                    
+                    for i in 0..length{
+                        println!("Doing insturction: {}",i);
+                        let opcode:u8 = bytecode.read_be().unwrap();
+                        match opcode {
+
+                            18 =>{
+                                let index:u8 = bytecode.read_be().unwrap();
+                                let value = &constant_pool[index as usize -1 ];
+
+                                match value {
+                                    ConstantPoolTags::String(utf8_index) => {
+                                        if let ConstantPoolTags::Utf8(_, Data) = &constant_pool[*utf8_index as usize -1] {
+                                            operand_stack.push(Varubals::String(Data.to_string()))
+                                        }
+                                    }
+
+                                    _ => {panic!("Loading value not implimented: {:?}",value)}
+                                    
+                                }
+
+                            }
+                            
+                            178 => {
+                                let mut class_name_final = "";
+                                let mut name_final = "";
+                                let mut type_final = "";
+
+                                let index:u16 = bytecode.read_be().unwrap();
+                                let fieldref = &constant_pool[index as usize -1 ];
+                                if let ConstantPoolTags::Fieldref(a,b ) = fieldref{
+                                    let class_index = &constant_pool[*a as usize -1 ];
+                                    if let ConstantPoolTags::Class(u) = class_index{
+                                        let utf8 = &constant_pool[*u as usize -1 ];
+                                        if let ConstantPoolTags::Utf8(_, class_name) = utf8{
+                                            println!("Class Name: {}",class_name);
+                                            class_name_final = class_name;
+                                        }
+                                    
+                                    }
+
+
+
+
+
+                                    let name_and_type_index = &constant_pool[*b as usize -1 ];
+                                    if let ConstantPoolTags::NameAndType(u,j) = name_and_type_index{
+                                        let utf81 = &constant_pool[*u as usize -1 ];
+                                        let utf82 = &constant_pool[*j as usize -1 ];
+
+                                        
+
+                                        if let ConstantPoolTags::Utf8(_, class_name) = utf81{
+                                            println!("Method Name: {}",class_name);
+                                            name_final = class_name;
+                                        }
+                                        if let ConstantPoolTags::Utf8(_, class_name) = utf82{
+                                            println!("Method Type: {}",class_name);
+                                            type_final = class_name;
+                                        }
+
+                                    }
+
+
+
+
+
+                                }
+
+                                operand_stack.push(Varubals::Class(class_name_final.to_string(), name_final.to_string(), type_final.to_string()));
+
+
+                            }
+                            177 =>{
+                                println!("Returning function back up call stack");
+                                break;
+                            }
+                            183 | 182 =>{
+
+                                let index:u16 = bytecode.read_be().unwrap();
+                                let methodred = &constant_pool[index as usize -1 ];
+                                match methodred {
+                                    ConstantPoolTags::Methodref(a, b) => {
+                                        let mut class_name_final = "";
+                                        let class_index = &constant_pool[*a as usize -1 ];
+                                        if let ConstantPoolTags::Class(u) = class_index{
+                                            let utf8 = &constant_pool[*u as usize -1 ];
+                                            if let ConstantPoolTags::Utf8(_, class_name) = utf8{
+                                                println!("Class Name: {}",class_name);
+                                                class_name_final = class_name;
+                                            }
+                                        
+                                        }
+                                        let mut name_final = "";
+                                        let mut type_final = "";
+
+                                        let name_and_type_index = &constant_pool[*b as usize -1 ];
+                                        if let ConstantPoolTags::NameAndType(u,j) = name_and_type_index{
+                                            let utf81 = &constant_pool[*u as usize -1 ];
+                                            let utf82 = &constant_pool[*j as usize -1 ];
+
+                                            
+
+                                            if let ConstantPoolTags::Utf8(_, class_name) = utf81{
+                                                println!("Method Name: {}",class_name);
+                                                name_final = class_name;
+                                            }
+                                            if let ConstantPoolTags::Utf8(_, class_name) = utf82{
+                                                println!("Method Type: {}",class_name);
+                                                type_final = class_name;
+                                            }
+
+                                        }
+
+                                        execute_internel_function(class_name_final,name_final,type_final,&mut operand_stack);
+
+
+                                    },
+                                    _ => panic!("Expected Method Ref")
+                                }
+
+                            },
+                            42 =>{
+                                operand_stack.push(local_varuble_array[0].clone());
+                            }
+                            _ => {panic!("Unknown opcode: {}",opcode)}
+                        }
+                    }
+
+
+
+                },
+                attributes::attribute_info::SourceFile(_) => todo!(),
+                attributes::attribute_info::DUMMY => todo!(),
+            }
+
+        }
+    }
+
+
 
 
 }  
