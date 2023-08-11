@@ -43,6 +43,7 @@ pub enum ReferenceType{
 
 fn main() {
     
+    
     let mut reader = Cursor::new(HELLOWORLD.to_vec());
     if reader.read_be::<u32>().unwrap() != 0xCAFEBABE{ // checks magic id of class files
         panic!("Magic is not valid")
