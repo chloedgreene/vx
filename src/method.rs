@@ -8,13 +8,16 @@ use crate::{
 
 #[derive(Debug)]
 
-pub struct method_info {
+pub struct MethodInfo {
     pub access_flag: u16,
     pub name_index: u16,
     pub descriptor_index: u16,
     pub attributes_count: u16,
-    pub attributes: Vec<attributes::attribute>,
+    pub attributes: Vec<attributes::Attribute>,
 }
+
+
+#[allow(dead_code)]
 enum MethodAccessFlag {
     PUBLIC = 0x0001,
     PRIVATE = 0x0002,

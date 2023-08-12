@@ -1,3 +1,5 @@
+use log::{info, trace};
+
 use crate::Varubals;
 
 pub fn execute_internel_function(
@@ -8,10 +10,13 @@ pub fn execute_internel_function(
 ) {
     // spelling mistake intentional, ask chloe
 
+
+    trace!(target: "exec","Running {}.{}:{}",class,name,_tpye);
+
     match class {
         "java/lang/Object" => match name {
             "<init>" => {
-                println!("Called constructor on object")
+                info!(target: "class","Called constructor on object")
             }
 
             _ => panic!("Unsupported method name, does not exsist :{}", name),
@@ -19,10 +24,31 @@ pub fn execute_internel_function(
 
         "java/io/PrintStream" => match name {
             "println" => {
-                if let Varubals::String(d) = local_stack.pop().unwrap() {
-                    println!("{}", d)
+                // if let Varubals::String(d) = local_stack.pop().unwrap() {
+                //     println!("{}", d)
+                // }
+                // if let Varubals::Int(d) = local_stack.pop().unwrap() {
+                //     println!("{}", d)
+                // }
+
+                let value = local_stack.pop().unwrap();
+            
+                match &value {
+
+                    Varubals::String(g) =>{
+                        println!("{}",g)
+                    }
+
+                    Varubals::Int(g) =>{
+                        println!("{}",g)
+                    }
+
+                    _ => {panic!("Cant print {:?}",value)}
+                    
                 }
+
             }
+
 
             _ => panic!("Unsupported method name, does not exsist :{}", name),
         },

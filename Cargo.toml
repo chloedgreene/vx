@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 binread = "*"
 clap = "4.3.21"
+env_logger = "0.10.0"
+log = "0.4.19"

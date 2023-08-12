@@ -1,37 +1,37 @@
 use binread::{io::Cursor, BinReaderExt};
+use log::{info,trace};
 use std::{io::Read};
 
 use crate::{attributes, constpool::ConstantPoolTags};
 
 #[derive(Debug)]
-pub struct attribute {
+pub struct Attribute {
     pub attribute_name_index: u16,
     pub attribute_length: u32,
-    pub info: attribute_info,
+    pub info: AttributeInfo,
 }
 
 #[derive(Debug)]
-pub enum attribute_info {
+pub enum AttributeInfo {
     LineNumberTable(u16, Vec<(u16, u16)>),
-    Code(u16, u16, u32, Vec<u8>, u16, u16, Vec<attribute>),
+    Code(u16, u16, u32, Vec<u8>, u16, u16, Vec<Attribute>),
     SourceFile(u16),
-    DUMMY, //TODO: REMOVE
 }
 
 pub fn get_atributes(
     attributes_count: u16,
     reader: &mut Cursor<Vec<u8>>,
     constant_pool: &Vec<ConstantPoolTags>,
-) -> Vec<attribute> {
-    let mut attributes: Vec<attribute> = vec![];
+) -> Vec<Attribute> {
+    let mut attributes: Vec<Attribute> = vec![];
     for _i in 0..attributes_count {
         let attribute_name_index = reader.read_be::<u16>().unwrap();
         let attribute_length = reader.read_be::<u32>().unwrap();
         let attribute_type = &constant_pool[attribute_name_index as usize - 1];
 
-        println!("Printing Attributes: {:?}", attribute_type);
+        trace!(target: "attribute","Printing Attributes: {:?}", attribute_type);
 
-        let info: attributes::attribute_info = match attribute_type {
+        let info: attributes::AttributeInfo = match attribute_type {
             ConstantPoolTags::Utf8(_, attrupt) => {
                 let att = match attrupt.as_str() {
                     "LineNumberTable" => {
@@ -44,7 +44,7 @@ pub fn get_atributes(
                             let ln = reader.read_be::<u16>().unwrap(); //liine number
                             lnt.push((spc, ln))
                         }
-                        attributes::attribute_info::LineNumberTable(lntl, lnt)
+                        attributes::AttributeInfo::LineNumberTable(lntl, lnt)
                     }
 
                     "Code" => {
@@ -63,7 +63,7 @@ pub fn get_atributes(
                         let attribues_count = reader.read_be::<u16>().unwrap();
                         let atatributes = get_atributes(attributes_count, reader, constant_pool);
 
-                        attributes::attribute_info::Code(
+                        attributes::AttributeInfo::Code(
                             max_stack,
                             max_locals,
                             code_length,
@@ -76,7 +76,7 @@ pub fn get_atributes(
 
                     "SourceFile" => {
                         let sourcefile_index = reader.read_be::<u16>().unwrap();
-                        attributes::attribute_info::SourceFile(sourcefile_index)
+                        attributes::AttributeInfo::SourceFile(sourcefile_index)
                     }
 
                     _ => {
@@ -91,12 +91,12 @@ pub fn get_atributes(
             }
         };
 
-        let atty = attribute {
+        let atty = Attribute {
             attribute_name_index,
             attribute_length,
             info,
         };
-        println!("Attribute Inter Info : {:?}", &atty);
+        info!(target: "attribute","Attribute Inter Info : {:?}", &atty);
         attributes.push(atty);
     }
     attributes
