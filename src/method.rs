@@ -2,10 +2,6 @@ use crate::{
     attributes::{self},
 };
 
-
-
-
-
 #[derive(Debug)]
 
 pub struct MethodInfo {

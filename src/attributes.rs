@@ -87,7 +87,7 @@ pub fn get_atributes(
             }
 
             _ => {
-                todo!("Not utf8")
+                todo!("Not known")
             }
         };
 

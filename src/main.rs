@@ -13,13 +13,13 @@ use log::{info, trace};
 use crate::{
     attributes::{Attribute, get_atributes},
     constpool::get_constant_pool,
-    javafunctionsrs::execute_internel_function,
+    glocalfunctionsrs::execute_internel_function,
     method::MethodInfo,
 };
 
 mod attributes;
 mod constpool;
-mod javafunctionsrs;
+mod glocalfunctionsrs;
 mod method;
 
 #[allow(dead_code)]
@@ -332,6 +332,20 @@ fn main() {
                             }
                             6 => {
                                 operand_stack.push(Varubals::Int(3))
+                            }
+                            3 => {
+                                operand_stack.push(Varubals::Int(0))
+                            }
+                            4 => {
+                                operand_stack.push(Varubals::Int(1))
+                            }
+                            16 => {
+                                let byte:u8 = bytecode.read_be().unwrap();
+                                operand_stack.push(Varubals::Int(byte.into()));
+                            }
+                            54 => {
+                                let index:u8 = bytecode.read_be().unwrap();
+                                local_varuble_array[index as usize] = operand_stack.pop().unwrap();
                             }
                             _ => {
                                 panic!("Unknown opcode: {}", opcode)
