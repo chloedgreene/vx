@@ -15,3 +15,7 @@ sources:
 ![https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html]
 ![https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-5.html]
 ![https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.3]
+
+
+playlist i listened to while making this
+https://www.youtube.com/watch?v=WVOH00wVFbc

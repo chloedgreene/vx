@@ -1,8 +1,8 @@
 use binread::{io::Cursor, BinReaderExt};
-use std::{io::Read};
+use std::io::Read;
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub enum ConstantPoolTags {
     Class(u16), //name index
     Fieldref(u16, u16),
