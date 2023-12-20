@@ -9,13 +9,13 @@
 //this girls going to make her own java and n o b o d y can stop me
 //even jesus, or father t, or the grimreaper
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 
 pub struct Interfaces{ // this is a stud, its worthless, i just need the object lmfao
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 
 pub struct Fields{ // this is a stud, its worthless, i just need the object lmfao
 }

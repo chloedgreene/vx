@@ -4,14 +4,14 @@ use std::{io::Read};
 
 use crate::{attributes, constpool::ConstantPoolTags};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Attribute {
     pub attribute_name_index: u16,
     pub attribute_length: u32,
     pub info: AttributeInfo,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AttributeInfo {
     LineNumberTable(u16, Vec<(u16, u16)>),
     Code(u16, u16, u32, Vec<u8>, u16, u16, Vec<Attribute>),

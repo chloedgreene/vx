@@ -35,15 +35,15 @@ fn main(){
 
     let classes:Vec<class::class> = load_classes(path_list);
 
-    if cfg!(debug_assertions) { //this handy line of code only runes in debug builds of the app
-        println!("{:?}",classes);
-    }
+    // if cfg!(debug_assertions) { //this handy line of code only runes in debug builds of the app
+    //     println!("{:?}",classes);
+    // }
 
-    let runtime_classes = classes.iter().map(|f| {
-        class_runtime::new(f)
+    let runtime_classes:Vec<class_runtime> = classes.iter().map(|f| {
+        class_runtime::new(f.clone())
     }).collect();
 
-    print!("{}",runtime_classes);
+    print!("{:?}",runtime_classes);
     
 
 }

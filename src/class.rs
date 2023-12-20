@@ -2,7 +2,7 @@ use crate::{method::MethodInfo, constpool::{ConstantPoolTags, get_constant_pool}
 
 use binread::{io::Cursor, BinReaderExt};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct class{
     version: (u16,u16),
     constant_pool: Vec<ConstantPoolTags>,

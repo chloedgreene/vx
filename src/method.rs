@@ -2,7 +2,7 @@ use crate::{
     attributes::{self},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 
 pub struct MethodInfo {
     pub access_flag: u16,

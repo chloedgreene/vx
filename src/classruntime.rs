@@ -19,9 +19,14 @@ pub enum ReferenceType {
     Constpool(u16),
 }
 
+
+#[derive(Debug, Copy, Clone)]
+
 pub struct frame{
 
 }
+
+#[derive(Debug, Clone)]
 
 pub struct class_runtime{
     class: class,
