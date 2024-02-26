@@ -4,15 +4,15 @@ use binread::{io::Cursor, BinReaderExt};
 
 #[derive(Debug, Clone)]
 pub struct class{
-    version: (u16,u16),
-    constant_pool: Vec<ConstantPoolTags>,
-    accessflag : u16,
-    this_class: u16,
-    super_class: u16,
-    interfaces : Vec<Interfaces>,
-    fields: Vec<Fields>,
-    methods : Vec<MethodInfo>,
-    classattributes: Vec<Attribute>
+    pub version: (u16,u16),
+    pub constant_pool: Vec<ConstantPoolTags>,
+    pub accessflag : u16,
+    pub this_class: u16,
+    pub super_class: u16,
+    pub interfaces : Vec<Interfaces>,
+    pub fields: Vec<Fields>,
+    pub methods : Vec<MethodInfo>,
+    pub classattributes: Vec<Attribute>
 }
 
 pub fn load_classes(path_list:&[String]) ->Vec<class>{
@@ -64,7 +64,7 @@ pub fn load_classes(path_list:&[String]) ->Vec<class>{
                 let method_count = reader.read_be::<u16>().unwrap();
                 let mut methodbuffer: Vec<MethodInfo> = vec![];
 
-                for i  in  0..method_count{
+                for _i  in  0..method_count{
                     let methodaccess_flags = reader.read_be::<u16>().unwrap();
                     let name_index = reader.read_be::<u16>().unwrap();
                     let descriptor_index = reader.read_be::<u16>().unwrap();

@@ -1,13 +1,13 @@
 use std::{env, process::exit};
 
-use binread::{io::Cursor, BinReaderExt};
+
 
 use classruntime::class_runtime;
-use constpool::ConstantPoolTags;
-use log::{info, trace};
-use method::MethodInfo;
 
-use crate::{constpool::get_constant_pool, attributes::{Attribute, get_atributes}, class::load_classes};
+
+
+
+use crate::{class::load_classes};
 
 mod attributes;
 mod constpool;
@@ -39,11 +39,16 @@ fn main(){
     //     println!("{:?}",classes);
     // }
 
-    let runtime_classes:Vec<class_runtime> = classes.iter().map(|f| {
-        class_runtime::new(f.clone())
-    }).collect();
+    let constructedd_classes:Vec<class_runtime> = classes.iter().map(|f| {
+        let mut current_class = class_runtime::new(f.clone());
 
-    print!("{:?}",runtime_classes);
+        current_class.run_method("<init>".to_owned());
+
+        current_class
+    }).collect();
+    
+
+
     
 
 }
